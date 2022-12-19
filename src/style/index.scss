@@ -1,0 +1,21 @@
+@import './mixin.scss';
+@import './transition.scss';
+@import './element-plus.scss';
+@import './sidebar.scss';
+@import './dark.scss';
+@import './tailwind.css';
+
+/* 전역 사용자 정의 CssVar */
+:root {
+  --pure-transition-duration: 0.016s;
+}
+
+/* 그레이 패턴 */
+.html-grey {
+  filter: grayscale(100%);
+}
+
+/* 색약 모드 */
+.html-weakness {
+  filter: invert(80%);
+}

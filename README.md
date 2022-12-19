@@ -1,1 +1,1 @@
-# parang-admin
+# Parang's Admin
