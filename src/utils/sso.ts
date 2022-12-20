@@ -13,7 +13,7 @@ import { subBefore, getQueryMap } from '@pureadmin/utils';
 (function () {
   // url에서 인자 가져오기
   const params = getQueryMap(location.href) as DataInfo<Date>;
-  const must = ['username', 'roles', 'accessToken'];
+  const must = ['email', 'roles', 'accessToken'];
   const mustLength = must.length;
   if (Object.keys(params).length !== mustLength) return;
 

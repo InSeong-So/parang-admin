@@ -10,7 +10,7 @@ export interface DataInfo<T> {
   /** 액세스 토큰을 새로 고치는 데 필요한 인터페이스 */
   refreshToken: string;
   /** 아이디 */
-  username?: string;
+  email?: string;
   /** 현재 로그인한 사용자의 권한 */
   roles?: Array<string>;
 }
@@ -41,24 +41,24 @@ export function setToken(data: DataInfo<Date>) {
       })
     : Cookies.set(TokenKey, cookieString);
 
-  function setSessionKey(username: string, roles: Array<string>) {
-    useUserStoreHook().SET_USERNAME(username);
+  function setSessionKey(email: string, roles: Array<string>) {
+    useUserStoreHook().SET_EMAIL(email);
     useUserStoreHook().SET_ROLES(roles);
     storageSession().setItem(sessionKey, {
       refreshToken,
       expires,
-      username,
+      email,
       roles,
     });
   }
 
-  if (data.username && data.roles) {
-    const { username, roles } = data;
-    setSessionKey(username, roles);
+  if (data.email && data.roles) {
+    const { email, roles } = data;
+    setSessionKey(email, roles);
   } else {
-    const username = storageSession().getItem<DataInfo<number>>(sessionKey)?.username ?? '';
+    const email = storageSession().getItem<DataInfo<number>>(sessionKey)?.email ?? '';
     const roles = storageSession().getItem<DataInfo<number>>(sessionKey)?.roles ?? [];
-    setSessionKey(username, roles);
+    setSessionKey(email, roles);
   }
 }
 

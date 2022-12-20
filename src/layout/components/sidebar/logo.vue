@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { useNav } from '@/layout/hooks/useNav';
 
-const props = defineProps({
-  collapse: Boolean,
-});
+const props = defineProps({ collapse: Boolean });
 
 const { title } = useNav();
 </script>
@@ -18,11 +16,9 @@ const { title } = useNav();
         class="sidebar-logo-link"
         to="/"
       >
-        <FontIcon icon="team-iconlogo" svg style="width: 35px; height: 35px" />
         <span class="sidebar-title">{{ title }}</span>
       </router-link>
       <router-link v-else key="expand" :title="title" class="sidebar-logo-link" to="/">
-        <FontIcon icon="team-iconlogo" svg style="width: 35px; height: 35px" />
         <span class="sidebar-title">{{ title }}</span>
       </router-link>
     </transition>

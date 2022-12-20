@@ -9,26 +9,26 @@ export type RequestMethods = Extract<
   'get' | 'post' | 'put' | 'delete' | 'patch' | 'option' | 'head'
 >;
 
-export interface PureHttpError extends AxiosError {
+export interface AdminClientError extends AxiosError {
   isCancelRequest?: boolean;
 }
 
-export interface PureHttpResponse extends AxiosResponse {
-  config: PureHttpRequestConfig;
+export interface AdminClientResponse extends AxiosResponse {
+  config: AdminClientRequestConfig;
 }
 
-export interface PureHttpRequestConfig extends AxiosRequestConfig {
-  beforeRequestCallback?: (request: PureHttpRequestConfig) => void;
-  beforeResponseCallback?: (response: PureHttpResponse) => void;
+export interface AdminClientRequestConfig extends AxiosRequestConfig {
+  beforeRequestCallback?: (request: AdminClientRequestConfig) => void;
+  beforeResponseCallback?: (response: AdminClientResponse) => void;
 }
 
-export default class PureHttp {
+export default class AdminClient {
   request<T>(
     method: RequestMethods,
     url: string,
     param?: AxiosRequestConfig,
-    axiosConfig?: PureHttpRequestConfig,
+    axiosConfig?: AdminClientRequestConfig,
   ): Promise<T>;
-  post<T, P>(url: string, params?: T, config?: PureHttpRequestConfig): Promise<P>;
-  get<T, P>(url: string, params?: T, config?: PureHttpRequestConfig): Promise<P>;
+  post<T, P>(url: string, params?: T, config?: AdminClientRequestConfig): Promise<P>;
+  get<T, P>(url: string, params?: T, config?: AdminClientRequestConfig): Promise<P>;
 }

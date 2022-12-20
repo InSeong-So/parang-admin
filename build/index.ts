@@ -1,12 +1,14 @@
 /** 환경변수 처리 */
-const warpperEnv = (envConf: Recordable): ViteEnv => {
+const wrappedEnv = (envConf: Recordable): ViteEnv => {
   /** 기본값으로 설정 */
   const ret: ViteEnv = {
-    VITE_PORT: 8848,
+    VITE_PORT: 3000,
     VITE_PUBLIC_PATH: '',
     VITE_ROUTER_HISTORY: '',
     VITE_CDN: false,
     VITE_COMPRESSION: 'none',
+    VITE_CLIENT_HOST: CLIENT_HOST_TABLE[process.env.DOT_ENV || 'alpha'],
+    VITE_API_HOST: API_HOST_TABLE[process.env.DOT_ENV || 'alpha'],
   };
 
   for (const envName of Object.keys(envConf)) {
@@ -23,6 +25,7 @@ const warpperEnv = (envConf: Recordable): ViteEnv => {
       process.env[envName] = JSON.stringify(realName);
     }
   }
+
   return ret;
 };
 
@@ -31,4 +34,4 @@ const loadEnv = (): ViteEnv => {
   return import.meta.env;
 };
 
-export { warpperEnv, loadEnv };
+export { wrappedEnv, loadEnv };

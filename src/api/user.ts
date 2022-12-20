@@ -4,7 +4,7 @@ export type UserResult = {
   success: boolean;
   data: {
     /** 아이디 */
-    username: string;
+    email: string;
     /** 현재 로그인한 사용자의 권한 */
     roles: Array<string>;
     /** `token` */
@@ -30,7 +30,7 @@ export type RefreshTokenResult = {
 
 /** 로그인 */
 export const getLogin = (data?: object) => {
-  return http.request<UserResult>('post', '/login', { data });
+  return http.request<UserResult>('post', '/auth/login', { data });
 };
 
 /** 토큰 새로 고침 */

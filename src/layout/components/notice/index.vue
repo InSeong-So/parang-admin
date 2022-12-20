@@ -69,12 +69,12 @@ notices.value.map((v) => (noticesNum.value += v.list.length));
 
   // 위의 notices 길이가 3보다 크면 아래 코드를 입력하십시오
   :deep(.el-tabs__nav-wrap) {
-    padding: 0 36px 0 36px;
+    padding: 0 36px;
   }
 
   // 위의 notices 길이가 3보다 크면 아래 코드를 입력하십시오
   :deep(.el-tabs__active-bar) {
-    margin: 0 36px 0 36px;
+    margin: 0;
   }
 }
 </style>

@@ -13,21 +13,21 @@ export const useUserStore = defineStore({
   id: 'pure-user',
   state: (): userType => ({
     // 아이디
-    username: storageSession().getItem<DataInfo<number>>(sessionKey)?.username ?? '',
+    email: storageSession().getItem<DataInfo<number>>(sessionKey)?.email ?? '',
     // 페이지 권한
     roles: storageSession().getItem<DataInfo<number>>(sessionKey)?.roles ?? [],
   }),
   actions: {
     /** 사용자 이름 저장 */
-    SET_USERNAME(username: string) {
-      this.username = username;
+    SET_EMAIL(email: string) {
+      this.email = email;
     },
     /** 사용자 권한 저장 */
     SET_ROLES(roles: Array<string>) {
       this.roles = roles;
     },
     /** 로그인 */
-    async loginByUsername(data) {
+    async loginByEmail(data) {
       return new Promise<UserResult>((resolve, reject) => {
         getLogin(data)
           .then((data) => {
@@ -43,12 +43,11 @@ export const useUserStore = defineStore({
     },
     /** 프런트엔드 로그아웃 (인터페이스 호출 안 함) */
     logOut() {
-      this.username = '';
+      this.email = '';
       this.roles = [];
       removeToken();
       useMultiTagsStoreHook().handleTags('equal', [...routerArrays]);
       resetRouter();
-      console.log('???');
       router.push('/login');
     },
     /** `token` 갱신 */

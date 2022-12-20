@@ -21,12 +21,12 @@ export function useNav() {
   const tooltipEffect = getConfig()?.TooltipEffect ?? 'light';
 
   /** 아이디 */
-  const username = computed(() => {
-    return useUserStoreHook()?.username;
+  const email = computed(() => {
+    return useUserStoreHook()?.email;
   });
 
   const avatarsStyle = computed(() => {
-    return username.value ? { marginRight: '10px' } : '';
+    return email.value ? { marginRight: '10px' } : '';
   });
 
   const isCollapse = computed(() => {
@@ -137,7 +137,7 @@ export function useNav() {
     resolvePath,
     isCollapse,
     pureApp,
-    username,
+    email,
     avatarsStyle,
     tooltipEffect,
   };

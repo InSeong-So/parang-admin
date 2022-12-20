@@ -18,53 +18,54 @@ import darkIcon from '@/assets/svg/dark.svg?component';
 import Lock from '@iconify-icons/ri/lock-fill';
 import User from '@iconify-icons/ri/user-3-fill';
 
-defineOptions({
-  name: 'Login',
-});
+defineOptions({ name: 'Login' });
+
 const router = useRouter();
 const loading = ref(false);
 const ruleFormRef = ref<FormInstance>();
 
 const { initStorage } = useLayout();
 initStorage();
-
 const { dataTheme, dataThemeChange } = useDataThemeChange();
 dataThemeChange();
 const { title } = useNav();
 
-const ruleForm = reactive({
-  username: 'admin',
-  password: 'admin123',
-});
+const ruleForm = reactive({ email: '', password: '' });
 
-const onLogin = async (formEl: FormInstance | undefined) => {
+const onLogin = async ($form: FormInstance | undefined) => {
   loading.value = true;
-  if (!formEl) return;
-  await formEl.validate((valid, fields) => {
-    if (valid) {
-      useUserStoreHook()
-        .loginByUsername({ username: ruleForm.username, password: 'admin123' })
-        .then((res) => {
-          if (res.success) {
-            // 백엔드 라우팅 가져오기
-            initRouter().then(() => {
-              router.push('/');
-              message('로그인 성공!', { type: 'success' });
-            });
-          }
-        });
-    } else {
+
+  if (!$form) return;
+
+  await $form.validate((valid, fields) => {
+    if (!valid) {
       loading.value = false;
+      message('로그인에 실패했습니다.', { type: 'error' });
       return fields;
     }
+
+    useUserStoreHook()
+      .loginByEmail({ email: ruleForm.email, password: ruleForm.password })
+      .then(async (res) => {
+        if (!res.success) return;
+
+        // 백엔드 라우팅 가져오기
+        await initRouter();
+
+        router.push('/');
+        message('로그인 성공!', { type: 'success' });
+      })
+      .catch((err) => {
+        message('로그인에 실패했습니다.', { type: 'error' });
+      });
   });
 };
 
 /** 공통 함수를 사용하여, `removeEventListener` 무효를 무시. */
 function onkeypress({ code }: KeyboardEvent) {
-  if (code === 'Enter') {
-    onLogin(ruleFormRef.value);
-  }
+  if (code !== 'Enter') return;
+
+  onLogin(ruleFormRef.value);
 }
 
 onMounted(() => {
@@ -109,11 +110,11 @@ onBeforeUnmount(() => {
                     trigger: 'blur',
                   },
                 ]"
-                prop="username"
+                prop="email"
               >
                 <el-input
                   clearable
-                  v-model="ruleForm.username"
+                  v-model="ruleForm.email"
                   placeholder="아이디"
                   :prefix-icon="useRenderIcon(User)"
                 />

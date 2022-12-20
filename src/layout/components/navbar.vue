@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import profile from '/profile.png';
 import Search from './search/index.vue';
-import Notice from './notice/index.vue';
+// import Notice from './notice/index.vue';
 import mixNav from './sidebar/mixNav.vue';
 import { useNav } from '@/layout/hooks/useNav';
 import Breadcrumb from './sidebar/breadCrumb.vue';
@@ -8,8 +9,7 @@ import topCollapse from './sidebar/topCollapse.vue';
 import LogoutCircleRLine from '@iconify-icons/ri/logout-circle-r-line';
 import Setting from '@iconify-icons/ri/settings-3-line';
 
-const { layout, device, logout, onPanel, pureApp, username, avatarsStyle, toggleSideBar } =
-  useNav();
+const { layout, device, logout, onPanel, pureApp, email, avatarsStyle, toggleSideBar } = useNav();
 </script>
 
 <template>
@@ -27,11 +27,11 @@ const { layout, device, logout, onPanel, pureApp, username, avatarsStyle, toggle
 
     <div v-if="layout === 'vertical'" class="vertical-header-right">
       <Search />
-      <Notice id="header-notice" />
+      <!-- <Notice id="header-notice" /> -->
       <el-dropdown trigger="click">
         <span class="el-dropdown-link navbar-bg-hover select-none">
-          <img src="https://avatars.githubusercontent.com/u/44761321?v=4" :style="avatarsStyle" />
-          <p v-if="username" class="dark:text-white">{{ username }}</p>
+          <img :src="profile" :style="avatarsStyle" />
+          <p v-if="email" class="dark:text-white">{{ email }}</p>
         </span>
         <template #dropdown>
           <el-dropdown-menu class="logout">

@@ -1,17 +1,32 @@
-import Axios, { AxiosInstance, AxiosRequestConfig, CustomParamsSerializer } from 'axios';
-import { PureHttpError, RequestMethods, PureHttpResponse, PureHttpRequestConfig } from './types.d';
+import axios, {
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+  CustomParamsSerializer,
+} from 'axios';
+import {
+  AdminClientError,
+  RequestMethods,
+  AdminClientResponse,
+  AdminClientRequestConfig,
+} from './types.d';
 import { stringify } from 'qs';
 import NProgress from '../progress';
 import { getToken, formatToken } from '@/utils/auth';
 import { useUserStoreHook } from '@/store/modules/user';
 
+const BASE_URL = import.meta.env.VITE_API_HOST;
+
 // @see：https://axios-http.com/kr/
 const defaultConfig: AxiosRequestConfig = {
+  baseURL: BASE_URL,
   timeout: 10000,
   headers: {
-    Accept: 'application/json, text/plain, */*',
+    Accept: '*/*',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': '*',
+    'Access-Control-Allow-Headers': '*',
     'Content-Type': 'application/json',
-    'X-Requested-With': 'XMLHttpRequest',
   },
   // 배열 형식 매개 변수 직렬화（https://github.com/axios/axios/issues/5142）
   paramsSerializer: {
@@ -19,7 +34,7 @@ const defaultConfig: AxiosRequestConfig = {
   },
 };
 
-class PureHttp {
+class AdminClient {
   constructor() {
     this.httpInterceptorsRequest();
     this.httpInterceptorsResponse();
@@ -32,15 +47,15 @@ class PureHttp {
   private static isRefreshing = false;
 
   /** 설정 객체 초기화 */
-  private static initConfig: PureHttpRequestConfig = {};
+  private static initConfig: AdminClientRequestConfig = {};
 
   /** 현재 Axios 인스턴스 객체 저장 */
-  private static axiosInstance: AxiosInstance = Axios.create(defaultConfig);
+  private static axiosInstance: AxiosInstance = axios.create(defaultConfig);
 
   /** 원본 요청을 다시 연결합니다. */
-  private static retryOriginalRequest(config: PureHttpRequestConfig) {
+  private static retryOriginalRequest(config: AdminClientRequestConfig) {
     return new Promise((resolve) => {
-      PureHttp.requests.push((token: string) => {
+      AdminClient.requests.push((token: string) => {
         config.headers['Authorization'] = formatToken(token);
         resolve(config);
       });
@@ -49,8 +64,8 @@ class PureHttp {
 
   /** 요청 인터셉터 */
   private httpInterceptorsRequest(): void {
-    PureHttp.axiosInstance.interceptors.request.use(
-      async (config: PureHttpRequestConfig) => {
+    AdminClient.axiosInstance.interceptors.request.use(
+      async (config: AdminClientRequestConfig) => {
         // 진행 표시줄 애니메이션 켜기
         NProgress.start();
         // post/get 등의 메서드가 들어오는지 여부를 우선적으로 판단하며, 그렇지 않으면 초기화 설정 등을 수행하여 되돌립니다.
@@ -58,8 +73,8 @@ class PureHttp {
           config.beforeRequestCallback(config);
           return config;
         }
-        if (PureHttp.initConfig.beforeRequestCallback) {
-          PureHttp.initConfig.beforeRequestCallback(config);
+        if (AdminClient.initConfig.beforeRequestCallback) {
+          AdminClient.initConfig.beforeRequestCallback(config);
           return config;
         }
         /** 화이트리스트 요청, 토큰이 필요없는 인터페이스 배치(토큰이 만료되어 재요청으로 인한 데드루프 문제를 방지하기 위해 요청 화이트리스트 설정을 통해) */
@@ -72,22 +87,22 @@ class PureHttp {
                 const now = new Date().getTime();
                 const expired = parseInt(data.expires) - now <= 0;
                 if (expired) {
-                  if (!PureHttp.isRefreshing) {
-                    PureHttp.isRefreshing = true;
+                  if (!AdminClient.isRefreshing) {
+                    AdminClient.isRefreshing = true;
                     // 토큰 만료 새로 고침
                     useUserStoreHook()
                       .handRefreshToken({ refreshToken: data.refreshToken })
                       .then((res) => {
                         const token = res.data.accessToken;
                         config.headers['Authorization'] = formatToken(token);
-                        PureHttp.requests.forEach((cb) => cb(token));
-                        PureHttp.requests = [];
+                        AdminClient.requests.forEach((cb) => cb(token));
+                        AdminClient.requests = [];
                       })
                       .finally(() => {
-                        PureHttp.isRefreshing = false;
+                        AdminClient.isRefreshing = false;
                       });
                   }
-                  resolve(PureHttp.retryOriginalRequest(config));
+                  resolve(AdminClient.retryOriginalRequest(config));
                 } else {
                   config.headers['Authorization'] = formatToken(data.accessToken);
                   resolve(config);
@@ -105,26 +120,41 @@ class PureHttp {
 
   /** 응답 인터셉터 */
   private httpInterceptorsResponse(): void {
-    const instance = PureHttp.axiosInstance;
+    const instance = AdminClient.axiosInstance;
     instance.interceptors.response.use(
-      (response: PureHttpResponse) => {
-        const $config = response.config;
+      (response: AdminClientResponse) => {
+        const {
+          data: $data,
+          config: { beforeResponseCallback, url, data: $requestData },
+        } = response;
+
+        let parsedData = $data as AxiosResponse<any, any>['data'];
+        const { email } = JSON.parse($requestData);
+
         // 진행 표시줄 애니메이션 끄기
         NProgress.done();
+
+        if (url && url.includes('/auth/login')) {
+          parsedData = {
+            success: true,
+            data: { ...$data, email, roles: 'admin', expires: new Date('2024/10/30 00:00:00') },
+          };
+        }
+
         // post/get 등의 메서드가 들어오는지 여부를 우선적으로 판단하며, 그렇지 않으면 초기화 설정 등을 수행하여 되돌립니다.
-        if (typeof $config.beforeResponseCallback === 'function') {
-          $config.beforeResponseCallback(response);
-          return response.data;
+        if (typeof beforeResponseCallback === 'function') {
+          beforeResponseCallback(response);
+          return parsedData;
         }
-        if (PureHttp.initConfig.beforeResponseCallback) {
-          PureHttp.initConfig.beforeResponseCallback(response);
-          return response.data;
-        }
-        return response.data;
+
+        AdminClient.initConfig.beforeResponseCallback &&
+          AdminClient.initConfig.beforeResponseCallback(response);
+
+        return parsedData;
       },
-      (error: PureHttpError) => {
+      (error: AdminClientError) => {
         const $error = error;
-        $error.isCancelRequest = Axios.isCancel($error);
+        $error.isCancelRequest = axios.isCancel($error);
         // 진행 표시줄 애니메이션 끄기
         NProgress.done();
         // 모든 응답 이상 구분 출처는 취소 요청/비취소 요청입니다
@@ -138,18 +168,18 @@ class PureHttp {
     method: RequestMethods,
     url: string,
     param?: AxiosRequestConfig,
-    axiosConfig?: PureHttpRequestConfig,
+    axiosConfig?: AdminClientRequestConfig,
   ): Promise<T> {
     const config = {
       method,
       url,
       ...param,
       ...axiosConfig,
-    } as PureHttpRequestConfig;
+    } as AdminClientRequestConfig;
 
     // 사용자 지정 요청/ 응답 되돌림 처리
     return new Promise((resolve, reject) => {
-      PureHttp.axiosInstance
+      AdminClient.axiosInstance
         .request(config)
         .then((response: undefined) => {
           resolve(response);
@@ -164,7 +194,7 @@ class PureHttp {
   public post<T, P>(
     url: string,
     params?: AxiosRequestConfig<T>,
-    config?: PureHttpRequestConfig,
+    config?: AdminClientRequestConfig,
   ): Promise<P> {
     return this.request<P>('post', url, params, config);
   }
@@ -173,10 +203,10 @@ class PureHttp {
   public get<T, P>(
     url: string,
     params?: AxiosRequestConfig<T>,
-    config?: PureHttpRequestConfig,
+    config?: AdminClientRequestConfig,
   ): Promise<P> {
     return this.request<P>('get', url, params, config);
   }
 }
 
-export const http = new PureHttp();
+export const http = new AdminClient();

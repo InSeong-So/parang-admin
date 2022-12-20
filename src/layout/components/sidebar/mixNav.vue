@@ -12,7 +12,7 @@ import Setting from '@iconify-icons/ri/settings-3-line';
 const menuRef = ref();
 const defaultActive = ref(null);
 
-const { route, device, routers, logout, onPanel, menuSelect, resolvePath, username, avatarsStyle } =
+const { route, device, routers, logout, onPanel, menuSelect, resolvePath, email, avatarsStyle } =
   useNav();
 
 function getDefaultActive(routePath) {
@@ -79,7 +79,7 @@ watch(
       <el-dropdown trigger="click">
         <span class="el-dropdown-link navbar-bg-hover select-none">
           <img src="https://avatars.githubusercontent.com/u/44761321?v=4" :style="avatarsStyle" />
-          <p v-if="username" class="dark:text-white">{{ username }}</p>
+          <p v-if="email" class="dark:text-white">{{ email }}</p>
         </span>
         <template #dropdown>
           <el-dropdown-menu class="logout">

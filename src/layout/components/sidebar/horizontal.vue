@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import profile from '/profile.png';
 import Search from '../search/index.vue';
 import Notice from '../notice/index.vue';
 import { ref, watch, nextTick } from 'vue';
@@ -10,7 +11,7 @@ import Setting from '@iconify-icons/ri/settings-3-line';
 
 const menuRef = ref();
 
-const { route, title, routers, logout, backHome, onPanel, menuSelect, username, avatarsStyle } =
+const { route, title, routers, logout, backHome, onPanel, menuSelect, email, avatarsStyle } =
   useNav();
 
 nextTick(() => {
@@ -51,8 +52,8 @@ watch(
       <Notice id="header-notice" />
       <el-dropdown trigger="click">
         <span class="el-dropdown-link navbar-bg-hover">
-          <img src="https://avatars.githubusercontent.com/u/44761321?v=4" :style="avatarsStyle" />
-          <p v-if="username" class="dark:text-white">{{ username }}</p>
+          <img :src="profile" :style="avatarsStyle" />
+          <p v-if="email" class="dark:text-white">{{ email }}</p>
         </span>
         <template #dropdown>
           <el-dropdown-menu class="logout">

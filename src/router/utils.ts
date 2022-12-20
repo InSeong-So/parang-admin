@@ -28,7 +28,35 @@ const IFrame = () => import('@/layout/frameView.vue');
 const modulesRoutes = import.meta.glob('/src/views/**/*.{vue,tsx}');
 
 // 동적 라우팅
-import { getAsyncRoutes } from '@/api/routes';
+// import { getAsyncRoutes } from '@/api/routes';
+
+const permissionRouter = {
+  path: '/permission',
+  meta: {
+    title: '권한 관리',
+    icon: 'lollipop',
+    rank: 10,
+  },
+  children: [
+    {
+      path: '/permission/page/index',
+      name: 'PermissionPage',
+      meta: {
+        title: '페이지 권한',
+        roles: ['admin', 'common'],
+      },
+    },
+    {
+      path: '/permission/button/index',
+      name: 'PermissionButton',
+      meta: {
+        title: '버튼 권한',
+        roles: ['admin', 'common'],
+        auths: ['btn_add', 'btn_edit', 'btn_delete'],
+      },
+    },
+  ],
+};
 
 function handRank(routeInfo: any) {
   const { name, path, parentId, meta } = routeInfo;
@@ -186,19 +214,24 @@ function initRouter() {
       });
     } else {
       return new Promise((resolve) => {
-        getAsyncRoutes().then(({ data }) => {
-          handleAsyncRoutes(cloneDeep(data));
-          storageSession().setItem(key, data);
-          resolve(router);
-        });
+        // getAsyncRoutes().then(({ data }) => {
+        //   handleAsyncRoutes(cloneDeep(data));
+        //   storageSession().setItem(key, data);
+        //   resolve(router);
+        // });
+        handleAsyncRoutes(cloneDeep([permissionRouter]));
+        storageSession().setItem(key, [permissionRouter]);
+        resolve(router);
       });
     }
   } else {
     return new Promise((resolve) => {
-      getAsyncRoutes().then(({ data }) => {
-        handleAsyncRoutes(cloneDeep(data));
-        resolve(router);
-      });
+      // getAsyncRoutes().then(({ data }) => {
+      //   handleAsyncRoutes(cloneDeep(data));
+      //   resolve(router);
+      // });
+      handleAsyncRoutes(cloneDeep([permissionRouter]));
+      resolve(router);
     });
   }
 }

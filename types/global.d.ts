@@ -63,6 +63,8 @@ declare global {
     VITE_ROUTER_HISTORY: string;
     VITE_CDN: boolean;
     VITE_COMPRESSION: ViteCompression;
+    VITE_CLIENT_HOST: string;
+    VITE_API_HOST: string;
   }
 
   /**
@@ -117,7 +119,7 @@ declare global {
     epThemeColor?: string;
     showLogo?: boolean;
     showModel?: string;
-    username?: string;
+    email?: string;
   }
 
   /**

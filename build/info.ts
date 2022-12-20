@@ -17,7 +17,7 @@ export function viteBuildInfo(): Plugin {
       outDir = resolvedConfig.build?.outDir ?? 'dist';
     },
     buildStart() {
-      console.log(bold(green(`👏 어서오세요${blue('[Parang's Admin]')}`)));
+      console.log(bold(green(`👏 어서오세요! ${blue("[Parang's Admin]")}`)));
       if (config.command === 'build') {
         startTime = dayjs(new Date());
       }

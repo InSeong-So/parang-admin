@@ -6,11 +6,11 @@ export default [
     url: '/login',
     method: 'post',
     response: ({ body }) => {
-      if (body.username === 'admin') {
+      if (body.email === 'admin') {
         return {
           success: true,
           data: {
-            username: 'admin',
+            email: 'admin',
             // 한 사용자가 여러 개의 역할을 가질 수 있습니다.
             roles: ['admin'],
             accessToken: 'eyJhbGciOiJIUzUxMiJ9.admin',
@@ -22,7 +22,7 @@ export default [
         return {
           success: true,
           data: {
-            username: 'common',
+            email: 'common',
             // 한 사용자가 여러 개의 역할을 가질 수 있습니다.
             roles: ['common'],
             accessToken: 'eyJhbGciOiJIUzUxMiJ9.common',

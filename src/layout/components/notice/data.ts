@@ -35,7 +35,7 @@ export const noticesData: TabItem[] = [
       },
       {
         avatar: 'https://gw.alipayobjects.com/zos/rmsportal/kISTdvpyTAhtGxpovNWd.png',
-        title: '这种模板可以区分多种通知类型',
+        title: '엘렐레~~',
         datetime: '1년 전',
         description: '',
         type: '1',
